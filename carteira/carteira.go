@@ -1,14 +1,37 @@
 package carteira
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
-type Carteira struct {
-	saldo int
+type Bitcoin int
+
+type Stringer interface {
+	String() string
 }
 
-func (c *Carteira) Depositar(quantidade int) {
-	fmt.Printf("O endereço do saldo no Depositar é %v \n", &c.saldo)
+func (b Bitcoin) String() string {
+	return fmt.Sprintf("%d BTC", b)
+}
+
+type Carteira struct {
+	saldo Bitcoin
+}
+
+func (c *Carteira) Depositar(quantidade Bitcoin) {
 	c.saldo += quantidade
 }
 
-func (c *Carteira) Saldo() int { return c.saldo }
+func (c *Carteira) Saldo() Bitcoin { return c.saldo }
+
+var ErroSaldoInsuficiente = errors.New("Não é possivel retirar: Saldo Insuficiente")
+
+func (c *Carteira) Retirar(quantidade Bitcoin) error {
+
+	if quantidade > c.saldo {
+		return ErroSaldoInsuficiente
+	}
+	c.saldo -= quantidade
+	return nil
+}
